@@ -1,4 +1,20 @@
-;;;;;;;;; This is my .emacs ;;;;;;;;;;
+;;;;;;;; This is my .emacs ;;;;;;;;;;
+
+(set-frame-font "Source code pro medium")
+
+;;;;;;;;;;;;;;; JDEE - Java ;;;;;;;;;;;
+(add-to-list 'load-path "~/.emacs.d/jdee")
+
+;(require 'jdee)
+
+;;; Evil Mode ;;;
+
+(add-to-list 'load-path "~/.emacs.d/evil")
+(require 'evil)
+
+;;; ESS ;;;;
+
+(require 'ess-site)
 
 ;;;;;;;;;;; Python Mode ;;;;;;;;;;;;;;;;;;;
 ;;(setf python-shell-interpreter "python2.7")
@@ -17,9 +33,6 @@
 
 ;;;;;;;; Command Settings ;;;;;;;;;;
 (put 'downcase-region 'disabled nil)
-
-;;;;;;;;;;;;; Looks ;;;;;;;;;;;;;;;;;;;
-(set-face-background 'region "cyan")
 
 ;;;;;;;;;;;; Variable Declarations ;;;;;;;;;;;
 
@@ -46,6 +59,85 @@
 
 ;;;;;;;; Functions ;;;;;;;;;;;;
 
+(defun insert-apostrophe()
+  "Inserts an appostrophe as the second to last char in the word before point, cursor will stay at current point. Ex Ethans -> Ethan's"
+  (interactive)
+  (let ((cursor-pos (+ 1 (point))))
+    (backward-word)
+    (forward-word)
+    (backward-char)
+    (insert-char 39)    
+    (goto-char cursor-pos)))
+
+(defun single-quote-word ()
+  "Wraps the word behind the cursor in single quotes"
+  (interactive)
+  (let ((cursor-pos (+ 1 (point))))
+    (backward-word)
+    (insert-char 39)    
+    (forward-word)
+    (insert-char 39)    
+    (goto-char cursor-pos)))
+
+
+(defun single-quote-region ()
+ (interactive)
+ (insert "\'")
+ (exchange-point-and-mark)
+ (insert "\'"))
+
+(defun double-quote-region ()
+ (interactive)
+ (insert "\"")
+ (exchange-point-and-mark)
+ (insert "\""))
+
+(defun double-quote-word ()
+  "Wraps the word behind the cursor in single quotes"
+  (interactive)
+  (let ((cursor-pos (+ 1 (point))))
+    (backward-word)
+    (insert "\"")    
+    (forward-word)
+    (insert "\"")    
+    (goto-char cursor-pos)))
+
+(defun insert-apostrophe-and-capitalize()
+  "Inserts an apostophe and capitalizes the word before the point"
+  (interactive)
+  (capitalize-word -1)
+  (insert-apostrophe))
+
+(defun make-possessive ()
+  ""
+  (interactive)
+  (let ((cursor-pos (+ 2 (point))))
+  (backward-word)
+  (forward-word)
+  (insert-char 39)
+  (insert-char 115)
+  (goto-char cursor-pos)))
+
+(defun make-possessive-and-capitalize ()
+  ""
+  (interactive)
+  (let ((cursor-pos (+ 2 (point))))
+    (capitalize-word -1)
+    (backward-word)
+    (forward-word)
+    (insert-char 39)
+    (insert-char 115)  
+    (goto-char cursor-pos)))
+
+(defun comma-to-new-sentence ()
+  "Changes a comma to a period after you have started the next sentence. Call from the end of the first word of the new sentence"
+  (interactive)
+  (backward-word 2)
+  (forward-word)
+  (delete-char 1)
+  (insert-char 46)
+  (capitalize-word 1))
+  
 (defun kill-junk-buffers ()		;rewrite with tagbodys to combat error with non-existent buffers
   (interactive)
   (cl-loop for i in '("*Buffer List*" "*Backtrace*" "*Messages*" "*Help*" "*Completions*") do
@@ -82,6 +174,17 @@
   (interactive)
   (shell-command "amixer set Master 5%+ -q"))
 
+
+(defmacro defopen-buffer (name file-name &optional docstring)
+  `(defun ,name ()
+     ,docstring
+     (interactive)
+     (setq *previous-buffer* (current-buffer))
+     (find-file ,file-name)))
+       
+
+(defopen-buffer open-stumpwmrc "~/.stumpwmrc" "Opens my stumpwmrc for editing")
+  
 (defun open-dot-emacs ()
   "Opens ~/.emacs for editing"
   (interactive)
@@ -248,19 +351,29 @@
 (define-prefix-command 'meta-map)
 
 ;;;;;;;;;;;;; Keybindings ;;;;;;;;;;;;;;;
+(global-set-key (kbd "C-v") 'cont-v-map) ;assigns C-v as a new prefix
+;;;; C-u M-! - insert shell command
+(gsk "C-v q" single-quote-word)
+(gsk "C-v Q" double-quote-word)
+(gsk "C-c \'" single-quote-region)
+(gsk "C-c \"" double-quote-region)
+(gsk "C-v o" make-possessive)
+(gsk "C-v O" make-possessive-and-capitalize)
+(gsk "C-v n" comma-to-new-sentence)
+(gsk "C-v i" insert-apostrophe)
+(gsk "C-v I" insert-apostrophe-and-capitalize)
+(gsk "C-v j" join-line)
 (gsk "C-z" delete-other-windows)
 (gsk "C-x e" end-of-visual-line)
-(global-set-key (kbd "C-v") 'cont-v-map) ;assigns C-v as a new prefix
+(gsk "C-v C-e" open-stumpwmrc)
 (gsk "C-," scroll-down-command)
 (gsk "C-." scroll-up-command)
 (gsk "C-v C-s" ansi-term)
 (gsk "C-v w" webjump)
 (gsk "C-v p" goto-python)
 (gsk "C-v l" goto-previous)
-(gsk "C-v r" goto-stock)
-(global-set-key (kbd "C-v i") 'goto-inferior-lisp)
+(gsk "C-v C-SPC" rectangle-mark-mode)
 (global-set-key (kbd "C-v k") 'kill-junk-buffers)
-(global-set-key (kbd "C-v m") 'open-magic-square)
 (global-set-key (kbd "C-v c") 'goto-conkerorrc)
 (global-set-key (kbd "C-v s") 'goto-scratch)
 (global-set-key (kbd "C-v e") 'open-dot-emacs)
@@ -311,39 +424,71 @@
 (global-set-key (kbd "M-<right>") 'mocp-next)
 (global-set-key (kbd "M-<left>") 'mocp-prev)
 
-;;;;;;;; Misc/Unsorted ;;;;;;;
+;;;;;;;;;;;;;;;;;;;; evil mode ;;;;;;;;;;;;;;;;;;;
+(define-key evil-insert-state-map (kbd "C-c p") 'goto-python)
+(define-key evil-insert-state-map (kbd "C-c p") 'goto-python)
+(define-key evil-normal-state-map (kbd "C-c p") 'goto-python)
+(define-key evil-insert-state-map (kbd "M-SPC") 'evil-force-normal-state)
+(define-key evil-normal-state-map (kbd "M-SPC") 'evil-insert)
+(define-key evil-normal-state-map "\C-e" 'evil-end-of-line)
+(define-key evil-insert-state-map "\C-e" 'end-of-line)
+(define-key evil-visual-state-map "\C-e" 'evil-end-of-line)
+(define-key evil-motion-state-map "\C-e" 'evil-end-of-line)
+(define-key evil-normal-state-map "\C-f" 'evil-forward-Char)
+(define-key evil-insert-state-map "\C-f" 'evil-forward-Char)
+(define-key evil-insert-state-map "\C-f" 'evil-forward-Char)
+(define-key evil-normal-state-map "\C-b" 'evil-baCkward-Char)
+(define-key evil-insert-state-map "\C-b" 'evil-baCkward-Char)
+(define-key evil-visual-state-map "\C-b" 'evil-baCkward-Char)
+(define-key evil-normal-state-map "\C-d" 'evil-delete-Char)
+(define-key evil-insert-state-map "\C-d" 'evil-delete-Char)
+(define-key evil-visual-state-map "\C-d" 'evil-delete-Char)
+(define-key evil-insert-state-map "\C-n" 'evil-next-line) 
+(define-key evil-normal-state-map "\C-n" 'evil-next-line) 
+(define-key evil-normal-state-map "\C-p" 'evil-previous-line)
+(define-key evil-insert-state-map "\C-p" 'evil-previous-line)
+(define-key evil-visual-state-map "\C-p" 'evil-previous-line)
+(define-key evil-normal-state-map "fw" 'flyspell-auto-correct-word)
+(define-key evil-normal-state-map "fe" 'flyspell-correct-word-before-point)
+(define-key evil-normal-state-map "vv" 'split-window-vertically)
+(define-key evil-normal-state-map "VV" 'split-window-horizontally)
+(define-key evil-normal-state-map "vc" 'delete-window)
+
+;;;;;;;; misc/unsorted ;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(TeX-view-program-list (quote (("mupdf" ("mupdf f") ""))))
- '(TeX-view-program-selection
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["black" "red3" "forestgreen" "yellow3" "blue" "magenta3" "deepskyblue" "gray50"])
+ '(custom-enabled-themes (quote (manoj-dark)))
+ '(doc-view-continuous t)
+ '(initial-scratch-message
+   ";; this buffer is for notes you don't want to save, and for lisp evaluation.
+;; if you want to create a file, visit that file with c-x c-f,
+;; then enter the text in that file's own buffer.
+
+")
+ '(package-selected-packages
+   (quote
+    (## cython-mode evil package-build shut-up epl git commander f s cask jdee pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
+ '(send-mail-function (quote mailclient-send-it))
+ '(tex-view-program-list (quote (("mupdf" ("mupdf f") ""))))
+ '(tex-view-program-selection
    (quote
     (((output-dvi has-no-display-manager)
       "dvi2tty")
      ((output-dvi style-pstricks)
       "dvips and gv")
      (output-dvi "xdvi")
-     (output-pdf "PDF Tools")
+     (output-pdf "pdf tools")
      (output-html "xdg-open"))))
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
- '(custom-enabled-themes (quote (tsdh-dark)))
- '(doc-view-continuous t)
- '(initial-scratch-message
-   ";; This buffer is for notes you don't want to save, and for Lisp evaluation.
-;; If you want to create a file, visit that file with C-x C-f,
-;; then enter the text in that file's own buffer.
-
-")
- '(package-selected-packages
-   (quote
-    (pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
- '(send-mail-function (quote mailclient-send-it))
  '(virtualenv-root "~/.virtualenvs/"))
+
+;;removed dash because it was causing an error from package-build
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -362,9 +507,7 @@
    )
   (package-initialize))
 
-;;;;;;;;; Aesthetics ;;;;;;;;;;
-(set-foreground-color "cyan")
-(set-cursor-color "cyan")
+
 
 ;;;;;;;;;;;;;;; Webjumps ;;;;;;;;;;;;;;;;;;;;;;
 
@@ -390,3 +533,34 @@
 
 ;;;;;;;;; end .emacs ;;;;;;
 
+;; ;; In my case /path/to/quicklisp is ~/quicklisp
+;; (defvar quicklisp-path "/path/to/quicklisp")
+;; ;;
+;; ;; Load slime-helper, this sets up various autoloads:
+;; ;;
+;; (load (concat quicklisp-path "/slime-helper"))
+;; ;;
+;; ;; Set up slime with whatever modules you decide to use:
+;; ;;
+;; (slime-setup '(slime-fancy slime-mrepl slime-banner slime-tramp
+;; 	       slime-xref-browser slime-highlight-edits
+;; 	       slime-sprof))
+;; ;;
+;; ;; Decide where to put a slime scratch file, if you want one, and set
+;; ;; it up with:
+;; ;;
+;; (setf slime-scratch-file "/ethan/ethan/slime-scratch")
+;; ;;
+;; ;; Unfortunately there is no hook for the slime-scratch mode so if you
+;; ;; want to automatically enable/disable various minor modes in the
+;; ;; slime scratch buffer you must do something like:
+;; ;;
+;; (defadvice slime-scratch
+;;     (after slime-scratch-adjust-modes () activate compile)
+;;   (turn-some-mode-off)
+;;   (turn-some-other-mode-on))
+
+;;;;;;;;;;;;; Looks ;;;;;;;;;;;;;;;;;;;
+(set-face-background 'region "cyan")
+(set-foreground-color "cyan")
+(set-cursor-color "cyan")
