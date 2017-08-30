@@ -2,16 +2,27 @@
 
 (set-frame-font "Source code pro medium")
 
+
 ;;;;;;;;;;;;;;; JDEE - Java ;;;;;;;;;;;
 (add-to-list 'load-path "~/.emacs.d/jdee")
 
-;(require 'jdee)
-
+					;(require 'jdee)
+;;;;;;;;;;;;;;;;;;;;;;;;; Key Chord ;;;;;;;;;;;;;;;;;;;;
+(require 'key-chord)
+(key-chord-mode 1)
+(key-chord-define-global "jk" 'evil-normal-state)
+(key-chord-define-global "sb" 'ido-switch-buffer)
+(key-chord-define-global "ow" 'other-window)
+(key-chord-define-global "vs" 'split-window-vertically)
+(key-chord-define-global "hs" 'split-window-horizontally)
+(key-chord-define-global "0s" 'delete-other-windows)
+(key-chord-define-global "de" 'open-dot-emacs)
+(key-chord-define-global "gs" 'goto-scratch)
 ;;; Evil Mode ;;;
 
 (add-to-list 'load-path "~/.emacs.d/evil")
 (require 'evil)
-
+(evil-mode)
 ;;; ESS ;;;;
 
 (require 'ess-site)
@@ -381,7 +392,7 @@
 (global-set-key (kbd "C-x SPC") 'kill-region)
 (global-set-key (kbd "C-c r") 'rename-buffer)
 (global-set-key (kbd "C-x p") 'check-parens)
-(global-set-key (kbd "C-x C-a") 'slime-eval-buffer)
+;; (global-set-key (kbd "C-x C-a") 'slime-eval-buffer)
 (global-set-key (kbd "C-c a") 'ansi-term)
 (global-set-key (kbd "C-c b") 'set-recall-point1)
 (global-set-key (kbd "C-c B") 'recall-to-point1)
@@ -426,7 +437,6 @@
 
 ;;;;;;;;;;;;;;;;;;;; evil mode ;;;;;;;;;;;;;;;;;;;
 (define-key evil-insert-state-map (kbd "C-c p") 'goto-python)
-(define-key evil-insert-state-map (kbd "C-c p") 'goto-python)
 (define-key evil-normal-state-map (kbd "C-c p") 'goto-python)
 (define-key evil-insert-state-map (kbd "M-SPC") 'evil-force-normal-state)
 (define-key evil-normal-state-map (kbd "M-SPC") 'evil-insert)
@@ -434,15 +444,7 @@
 (define-key evil-insert-state-map "\C-e" 'end-of-line)
 (define-key evil-visual-state-map "\C-e" 'evil-end-of-line)
 (define-key evil-motion-state-map "\C-e" 'evil-end-of-line)
-(define-key evil-normal-state-map "\C-f" 'evil-forward-Char)
-(define-key evil-insert-state-map "\C-f" 'evil-forward-Char)
-(define-key evil-insert-state-map "\C-f" 'evil-forward-Char)
-(define-key evil-normal-state-map "\C-b" 'evil-baCkward-Char)
-(define-key evil-insert-state-map "\C-b" 'evil-baCkward-Char)
-(define-key evil-visual-state-map "\C-b" 'evil-baCkward-Char)
-(define-key evil-normal-state-map "\C-d" 'evil-delete-Char)
-(define-key evil-insert-state-map "\C-d" 'evil-delete-Char)
-(define-key evil-visual-state-map "\C-d" 'evil-delete-Char)
+
 (define-key evil-insert-state-map "\C-n" 'evil-next-line) 
 (define-key evil-normal-state-map "\C-n" 'evil-next-line) 
 (define-key evil-normal-state-map "\C-p" 'evil-previous-line)
@@ -450,9 +452,16 @@
 (define-key evil-visual-state-map "\C-p" 'evil-previous-line)
 (define-key evil-normal-state-map "fw" 'flyspell-auto-correct-word)
 (define-key evil-normal-state-map "fe" 'flyspell-correct-word-before-point)
-(define-key evil-normal-state-map "vv" 'split-window-vertically)
-(define-key evil-normal-state-map "VV" 'split-window-horizontally)
-(define-key evil-normal-state-map "vc" 'delete-window)
+(define-key evil-normal-state-map "\C-a" 'evil-numbers/inc-at-pt)
+(define-key evil-normal-state-map "\C-x" 'evil-numbers/dec-at-pt)
+(define-key evil-normal-state-map " 'evil-numbers/dec-at-pt)
+
+; (define-key evil-normal-state-map "vv" 'split-window-vertically)
+;; (define-key evil-normal-state-map "VV" 'split-window-horizontally)
+;; (define-key evil-normal-state-map "vc" 'delete-other-windows)
+;; (define-key evil-normal-state-map "vb" 'ido-switch-buffer)
+;; (define-key evil-normal-state-map "vu" 'other-window)
+
 
 ;;;;;;;; misc/unsorted ;;;;;;;
 (custom-set-variables
@@ -463,8 +472,11 @@
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
-   ["black" "red3" "forestgreen" "yellow3" "blue" "magenta3" "deepskyblue" "gray50"])
- '(custom-enabled-themes (quote (manoj-dark)))
+   ["black" "red" "cyan" "cyan" "cyan" "magenta3" "deepskyblue" "black"])
+ '(custom-enabled-themes (quote (ahungry)))
+ '(custom-safe-themes
+   (quote
+    ("dfe0523e20114df987a41afb6ac5698307e65e0fcb9bff12dc94621e18d44c3d" default)))
  '(doc-view-continuous t)
  '(initial-scratch-message
    ";; this buffer is for notes you don't want to save, and for lisp evaluation.
@@ -474,7 +486,7 @@
 ")
  '(package-selected-packages
    (quote
-    (## cython-mode evil package-build shut-up epl git commander f s cask jdee pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
+    (ahungry-theme evil-nerd-commenter evil-space evil-visualstar evil-numbers elfeed wanderlust ## cython-mode evil package-build shut-up epl git commander f s cask jdee pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
  '(send-mail-function (quote mailclient-send-it))
  '(tex-view-program-list (quote (("mupdf" ("mupdf f") ""))))
  '(tex-view-program-selection
@@ -564,3 +576,4 @@
 (set-face-background 'region "cyan")
 (set-foreground-color "cyan")
 (set-cursor-color "cyan")
+(set-background-color "black")
