@@ -1,34 +1,89 @@
-;;;;;;;; This is my .emacs ;;;;;;;;;;
+;;;;;;; This is my .emacs ;;;;;;;;;;
 
+;;;;;;; Load Path ;;;;;;;;
+
+(add-to-list 'load-path "~/programming/from-gentoo/lisp/lisp/ethan.lisp")
+(add-to-list 'load-path "~/.emacs.d/space-chord")
+(add-to-list 'load-path "~/.emacs.d/elpa/evil-org-20170917.1447/")
+(add-to-list 'load-path "~/.emacs.d/elpa")
+(add-to-list 'load-path "~/.emacs.d/elpa/key-chord")
+(add-to-list 'load-path "/usr/bin/")
+(add-to-list 'load-path "~/.bashrc")
+(add-to-list 'load-path "~/.emacs.d/evil")
+;; (load "/usr/share/emacs/site-lisp/haskell-mode/haskell-mode.el")
+(autoload 'eimp-mode "eimp" "Emacs Image Manipulation Package." )
 (set-frame-font "Source code pro medium")
 
+;;;;;;;;;;;;;;;;;;;; Evil Mode ;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;; JDEE - Java ;;;;;;;;;;;
-(add-to-list 'load-path "~/.emacs.d/jdee")
-
-					;(require 'jdee)
-;;;;;;;;;;;;;;;;;;;;;;;;; Key Chord ;;;;;;;;;;;;;;;;;;;;
-(require 'key-chord)
-(key-chord-mode 1)
-(key-chord-define-global "jk" 'evil-normal-state)
-(key-chord-define-global "sb" 'ido-switch-buffer)
-(key-chord-define-global "ow" 'other-window)
-(key-chord-define-global "vs" 'split-window-vertically)
-(key-chord-define-global "hs" 'split-window-horizontally)
-(key-chord-define-global "0s" 'delete-other-windows)
-(key-chord-define-global "de" 'open-dot-emacs)
-(key-chord-define-global "gs" 'goto-scratch)
-;;; Evil Mode ;;;
-
-(add-to-list 'load-path "~/.emacs.d/evil")
 (require 'evil)
 (evil-mode)
+(add-hook 'evil-mode 'evil-snipe-mode)
+
+(define-key evil-insert-state-map (kbd "C-c p") 'goto-python)
+(define-key evil-normal-state-map (kbd "C-c p") 'goto-python)
+(define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+(define-key evil-insert-state-map (kbd "C-u") 'evil-scroll-up)
+(define-key evil-insert-state-map (kbd "M-SPC") 'evil-force-normal-state)
+(define-key evil-normal-state-map (kbd "M-SPC") 'evil-insert)
+(define-key evil-normal-state-map "\C-e" 'evil-end-of-line)
+(define-key evil-insert-state-map "\C-e" 'end-of-line)
+(define-key evil-visual-state-map "\C-e" 'evil-end-of-line)
+(define-key evil-motion-state-map "\C-e" 'evil-end-of-line)
+(define-key evil-insert-state-map "\C-n" 'evil-next-line) 
+(define-key evil-normal-state-map "\C-n" 'evil-next-line) 
+(define-key evil-normal-state-map "\C-p" 'evil-previous-line)
+(define-key evil-insert-state-map "\C-p" 'evil-previous-line)
+(define-key evil-visual-state-map "\C-p" 'evil-previous-line)
+(define-key evil-normal-state-map "fw" 'flyspell-auto-correct-word)
+(define-key evil-normal-state-map "fe" 'flyspell-correct-word-before-point)
+(define-key evil-normal-state-map "\C-a" 'evil-numbers/inc-at-pt)
+(define-key evil-normal-state-map "\C-x" 'evil-numbers/dec-at-pt)
+
+;;;;;;;;;;;;;;; Evil Org ;;;;;;;;;;;
+
+(require 'evil-org)
+(add-hook 'org-mode-hook 'evil-org-mode)
+(add-hook 'org-mode-hook '(lambda () (key-chord-define-local "al" 'org-todo)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;; Key Chord ;;;;;;;;;;;;;;;;;;;;
+
+(require 'key-chord)
+(require 'space-chord)
+(key-chord-mode 1)
+(key-chord-define-global "jk" 'evil-normal-state)
+(key-chord-define-global "kl" 'evil-insert-state)
+(key-chord-define-global "sd" 'evil-append)
+(key-chord-define-global "sb" 'ido-switch-buffer)
+(key-chord-define-global "sf" 'ido-find-file)
+(key-chord-define-global "hj" 'other-window)
+(key-chord-define-global "df" 'delete-other-windows)
+(key-chord-define-global "DE" 'open-dot-emacs)
+(key-chord-define-global "kb" 'kill-this-buffer)
+(key-chord-define-global "DF" 'ido-dired)
+(key-chord-define-global "QW" 'save-buffers-kill-emacs)
+(key-chord-define-global "qw" 'save-some-buffers) 
+(key-chord-define-global "gp" 'goto-python)
+(key-chord-define-global "gc" 'goto-current-project)
+(key-chord-define-global "fq" 'flyspell-correct-word-before-point)
+(key-chord-define-global "fw" 'flyspell-auto-correct-word)
+(key-chord-define-global "qt" 'goto-scratch)
+(key-chord-define-global "qp" 'goto-todo)
+(key-chord-define-global "hf" 'evil-search-forward)
+(space-chord-define-global "k" 'kill-buffer)
+(space-chord-define-global "q0" 'bash-term)
+(space-chord-define-global "[" 'eval-last-sexp)
+(space-chord-define-global "p" 'previous-buffer)
+(space-chord-define-global "0" 'split-window-vertically) 
+(space-chord-define-global "9" 'split-window-horizontally) 
+(space-chord-define-global "8" 'delete-other-windows) 
+
+
 ;;; ESS ;;;;
 
 (require 'ess-site)
 
 ;;;;;;;;;;; Python Mode ;;;;;;;;;;;;;;;;;;;
-;;(setf python-shell-interpreter "python2.7")
 (setf python-shell-interpreter "python")
 
 (defun switch-python-shell ()
@@ -40,13 +95,13 @@
 	 (setf python-shell-interpreter "python2.7") (print "Switched Python shell to Python 2.7"))))
 
 ;;;;;;;;;;;;;;; Startup Scratch Message ;;;;;;;;;;;;;;
-(setf initial-scratch-message (animate-string ";; Hello Ethan, welcome to Emacs. This is the scratch buffer" 0 0))
+(setf initial-scratch-message ";; Hello Ethan. Welcome to Emacs. This is the scratch buffer")
 
 ;;;;;;;; Command Settings ;;;;;;;;;;
 (put 'downcase-region 'disabled nil)
 
 ;;;;;;;;;;;; Variable Declarations ;;;;;;;;;;;
-
+(setq current-project "~/programming/python/siraj/network/network.py")
 (setq disabled-command-function nil)	
 (setq disabled-command-hook nil)
 (setq browse-url-browser-function 'browse-url-generic browse-url-generic-program "/bin/conkeror")
@@ -69,6 +124,10 @@
   `(global-set-key (kbd ,bind) (quote ,command)))
 
 ;;;;;;;; Functions ;;;;;;;;;;;;
+(defun bash-term ()
+  "Opens an ansi-term running bash"
+  (interactive)
+  (ansi-term "/bin/bash"))
 
 (defun insert-apostrophe()
   "Inserts an appostrophe as the second to last char in the word before point, cursor will stay at current point. Ex Ethans -> Ethan's"
@@ -92,7 +151,6 @@
 
 
 (defun single-quote-region ()
- (interactive)
  (insert "\'")
  (exchange-point-and-mark)
  (insert "\'"))
@@ -185,7 +243,6 @@
   (interactive)
   (shell-command "amixer set Master 5%+ -q"))
 
-
 (defmacro defopen-buffer (name file-name &optional docstring)
   `(defun ,name ()
      ,docstring
@@ -193,7 +250,6 @@
      (setq *previous-buffer* (current-buffer))
      (find-file ,file-name)))
        
-
 (defopen-buffer open-stumpwmrc "~/.stumpwmrc" "Opens my stumpwmrc for editing")
   
 (defun open-dot-emacs ()
@@ -206,15 +262,20 @@
   (interactive)
   (mode-line-other-buffer))
 
+(defun goto-current-project ()
+  "Switches to the scratch buffer"
+  (interactive)  
+  (find-file current-project))
+
 (defun goto-scratch ()
   "Switches to the scratch buffer"
   (interactive)  
   (switch-to-buffer "*scratch*"))
 
-(defun goto-stock ()
-  "Switches to the scratch buffer"
-  (interactive)  
-  (find-file "~/school/research/stock.py"))
+(defun goto-todo ()
+  "Opens to the main todo list"
+  (interactive)
+  (find-file "/ethan/ethan/.todo.org"))
 
 (defun goto-inferior-lisp ()
   "Switches to the inferior-lisp buffer"
@@ -232,30 +293,6 @@
   (interactive)
   (setq *previous-buffer* (current-buffer))
   (find-file "~/.conkerorrc"))
-
-(defun open-goof-off ()
-  "Opens the goof off file"
-  (interactive)
-  (setq *previous-buffer* (current-buffer))
-  (find-file "~/programming/from-gentoo/lisp/lisp/goof-off.lisp"))
-
-(defun open-magic-square ()
-  "Opens the magick-squares project"
-  (interactive)
-  (setq *previous-buffer* (current-buffer))
-  (find-file "~/programming/from-gentoo/lisp/lisp/magic-square.lisp"))
-
-(defun open-ethan ()
-  "Opens ~/.emacs for editing"
-  (interactive)
-  (setq *previous-buffer* (current-buffer))
-  (find-file "~/programming/from-gentoo/lisp/lisp/ethan.lisp"))
-
-(defun open-ethan-package()
-  "Opens ~/.emacs for editing"
-  (interactive)
-  (setq *previous-buffer* (current-buffer))
-  (find-file "~/programming/from-gentoo/lisp/lisp/ethan-package.lisp"))
 
 (defun set-recall-point1 ()
   "Sets the variable recall-point1 to POINT"
@@ -335,14 +372,6 @@
 
 ;;(setq inferior-lisp-program "/usr/bin/sbcl")
 (setq inferior-lisp-program "/usr/bin/clisp")
-
-;;;;;;; Load Path ;;;;;;;;
-(add-to-list 'load-path "~/programming/from-gentoo/lisp/lisp/ethan.lisp")
-(add-to-list 'load-path "~/emacs.d")
-(add-to-list 'load-path "/usr/bin/")
-(add-to-list 'load-path "~/.bashrc")
-;; (load "/usr/share/emacs/site-lisp/haskell-mode/haskell-mode.el")
-(autoload 'eimp-mode "eimp" "Emacs Image Manipulation Package." )
 
 ;;;;;;;;;;;; Default Modes ;;;;;;;;;;;;;
 (ido-mode t) 				;changes a few default keybindings
@@ -435,33 +464,6 @@
 (global-set-key (kbd "M-<right>") 'mocp-next)
 (global-set-key (kbd "M-<left>") 'mocp-prev)
 
-;;;;;;;;;;;;;;;;;;;; evil mode ;;;;;;;;;;;;;;;;;;;
-(define-key evil-insert-state-map (kbd "C-c p") 'goto-python)
-(define-key evil-normal-state-map (kbd "C-c p") 'goto-python)
-(define-key evil-insert-state-map (kbd "M-SPC") 'evil-force-normal-state)
-(define-key evil-normal-state-map (kbd "M-SPC") 'evil-insert)
-(define-key evil-normal-state-map "\C-e" 'evil-end-of-line)
-(define-key evil-insert-state-map "\C-e" 'end-of-line)
-(define-key evil-visual-state-map "\C-e" 'evil-end-of-line)
-(define-key evil-motion-state-map "\C-e" 'evil-end-of-line)
-
-(define-key evil-insert-state-map "\C-n" 'evil-next-line) 
-(define-key evil-normal-state-map "\C-n" 'evil-next-line) 
-(define-key evil-normal-state-map "\C-p" 'evil-previous-line)
-(define-key evil-insert-state-map "\C-p" 'evil-previous-line)
-(define-key evil-visual-state-map "\C-p" 'evil-previous-line)
-(define-key evil-normal-state-map "fw" 'flyspell-auto-correct-word)
-(define-key evil-normal-state-map "fe" 'flyspell-correct-word-before-point)
-(define-key evil-normal-state-map "\C-a" 'evil-numbers/inc-at-pt)
-(define-key evil-normal-state-map "\C-x" 'evil-numbers/dec-at-pt)
-(define-key evil-normal-state-map " 'evil-numbers/dec-at-pt)
-
-; (define-key evil-normal-state-map "vv" 'split-window-vertically)
-;; (define-key evil-normal-state-map "VV" 'split-window-horizontally)
-;; (define-key evil-normal-state-map "vc" 'delete-other-windows)
-;; (define-key evil-normal-state-map "vb" 'ido-switch-buffer)
-;; (define-key evil-normal-state-map "vu" 'other-window)
-
 
 ;;;;;;;; misc/unsorted ;;;;;;;
 (custom-set-variables
@@ -472,8 +474,8 @@
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
-   ["black" "red" "cyan" "cyan" "cyan" "magenta3" "deepskyblue" "black"])
- '(custom-enabled-themes (quote (ahungry)))
+   ["black" "red" "orange" "green" "pink" "magenta3" "deepskyblue" "black"])
+ '(custom-enabled-themes (quote (manoj-dark)))
  '(custom-safe-themes
    (quote
     ("dfe0523e20114df987a41afb6ac5698307e65e0fcb9bff12dc94621e18d44c3d" default)))
@@ -486,7 +488,8 @@
 ")
  '(package-selected-packages
    (quote
-    (ahungry-theme evil-nerd-commenter evil-space evil-visualstar evil-numbers elfeed wanderlust ## cython-mode evil package-build shut-up epl git commander f s cask jdee pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
+    (evil-smartparens evil-snipe evil-org evil-text-object-python evil-replace-with-register evil-search-highlight-persist egg ahungry-theme evil-nerd-commenter evil-space evil-visualstar evil-numbers elfeed wanderlust ## cython-mode evil package-build shut-up epl git commander f s cask jdee pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
+ '(red "#ffffff")
  '(send-mail-function (quote mailclient-send-it))
  '(tex-view-program-list (quote (("mupdf" ("mupdf f") ""))))
  '(tex-view-program-selection
@@ -499,8 +502,6 @@
      (output-pdf "pdf tools")
      (output-html "xdg-open"))))
  '(virtualenv-root "~/.virtualenvs/"))
-
-;;removed dash because it was causing an error from package-build
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -519,8 +520,6 @@
    )
   (package-initialize))
 
-
-
 ;;;;;;;;;;;;;;; Webjumps ;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'webjump)
@@ -535,44 +534,9 @@
 
 (set-foreground-color "cyan")
 (set-cursor-color "cyan")
-;;;;;;;;;;;;; UNUSED ;;;;;;;;;;;;
-
-;always have spell check
-;(require 'flyspell)
-;auto-load spell check for .tex
-;(add-to-list 'auto-mode-alist '("\\.tex\\'" .latex-mode))
-;(add-to-list 'auto-mode-alist '("\\.tex\\'" . flyspell-mode))
-
-;;;;;;;;; end .emacs ;;;;;;
-
-;; ;; In my case /path/to/quicklisp is ~/quicklisp
-;; (defvar quicklisp-path "/path/to/quicklisp")
-;; ;;
-;; ;; Load slime-helper, this sets up various autoloads:
-;; ;;
-;; (load (concat quicklisp-path "/slime-helper"))
-;; ;;
-;; ;; Set up slime with whatever modules you decide to use:
-;; ;;
-;; (slime-setup '(slime-fancy slime-mrepl slime-banner slime-tramp
-;; 	       slime-xref-browser slime-highlight-edits
-;; 	       slime-sprof))
-;; ;;
-;; ;; Decide where to put a slime scratch file, if you want one, and set
-;; ;; it up with:
-;; ;;
-;; (setf slime-scratch-file "/ethan/ethan/slime-scratch")
-;; ;;
-;; ;; Unfortunately there is no hook for the slime-scratch mode so if you
-;; ;; want to automatically enable/disable various minor modes in the
-;; ;; slime scratch buffer you must do something like:
-;; ;;
-;; (defadvice slime-scratch
-;;     (after slime-scratch-adjust-modes () activate compile)
-;;   (turn-some-mode-off)
-;;   (turn-some-other-mode-on))
 
 ;;;;;;;;;;;;; Looks ;;;;;;;;;;;;;;;;;;;
+;; (load-theme 'ahungry t)
 (set-face-background 'region "cyan")
 (set-foreground-color "cyan")
 (set-cursor-color "cyan")
