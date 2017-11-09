@@ -1,5 +1,6 @@
 ;;;;;;; This is my .emacs ;;;;;;;;;;
 
+
 ;;;;;;; Load Path ;;;;;;;;
 
 (add-to-list 'load-path "~/programming/from-gentoo/lisp/lisp/ethan.lisp")
@@ -18,7 +19,6 @@
 
 (require 'evil)
 (evil-mode)
-(add-hook 'evil-mode 'evil-snipe-mode)
 
 (define-key evil-insert-state-map (kbd "C-c p") 'goto-python)
 (define-key evil-normal-state-map (kbd "C-c p") 'goto-python)
@@ -39,12 +39,12 @@
 (define-key evil-normal-state-map "fe" 'flyspell-correct-word-before-point)
 (define-key evil-normal-state-map "\C-a" 'evil-numbers/inc-at-pt)
 (define-key evil-normal-state-map "\C-x" 'evil-numbers/dec-at-pt)
+(define-key evil-normal-state-map "f" 'evil-find-char)
 
 ;;;;;;;;;;;;;;; Evil Org ;;;;;;;;;;;
 
 (require 'evil-org)
 (add-hook 'org-mode-hook 'evil-org-mode)
-(add-hook 'org-mode-hook '(lambda () (key-chord-define-local "al" 'org-todo)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;; Key Chord ;;;;;;;;;;;;;;;;;;;;
 
@@ -70,6 +70,7 @@
 (key-chord-define-global "qt" 'goto-scratch)
 (key-chord-define-global "qp" 'goto-todo)
 (key-chord-define-global "hf" 'evil-search-forward)
+
 (space-chord-define-global "k" 'kill-buffer)
 (space-chord-define-global "q0" 'bash-term)
 (space-chord-define-global "[" 'eval-last-sexp)
@@ -77,8 +78,22 @@
 (space-chord-define-global "0" 'split-window-vertically) 
 (space-chord-define-global "9" 'split-window-horizontally) 
 (space-chord-define-global "8" 'delete-other-windows) 
+(space-chord-define-global "W" 'webjump) 
 
+;;;;;;;;;;; Evil Docview ;;;;;;;;;;;
 
+(define-minor-mode evil-pdf-view-mode
+  "Evil Docview Mode"
+  :keymap (make-sparse-keymap))
+
+(evil-define-key 'normal evil-pdf-view-mode-map "k" 'pdf-view-next-line-or-next-page)
+(evil-define-key 'normal evil-pdf-view-mode-map "j" 'pdf-view-previous-line-or-previous-page)
+
+(evil-define-key 'normal evil-pdf-view-mode-map "K" 'pdf-view-next-page-command)
+(evil-define-key 'normal evil-pdf-view-mode-map "J" 'pdf-view-previous-page-command)
+
+(add-hook 'pdf-view-mode-hook 'evil-pdf-view-mode)
+(add-hook 'pdf-view-mode-hook 'evil-normal-state) ;Not setting evil into normal state 
 ;;; ESS ;;;;
 
 (require 'ess-site)
@@ -363,6 +378,8 @@
 ;;;;;;;;;;;; Hooks ;;;;;;;;;;
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(add-hook 'python-mode-hook 'yafolding-mode)
+(add-hook 'cython-mode-hook 'yafolding-mode)
 (add-hook 'slime-mode-hook 'slime)
 (add-hook 'image-mode-hook 'eimp-mode)
 (add-hook 'pdf-view-mode-hook 'pdf-tools-install)
@@ -488,7 +505,7 @@
 ")
  '(package-selected-packages
    (quote
-    (evil-smartparens evil-snipe evil-org evil-text-object-python evil-replace-with-register evil-search-highlight-persist egg ahungry-theme evil-nerd-commenter evil-space evil-visualstar evil-numbers elfeed wanderlust ## cython-mode evil package-build shut-up epl git commander f s cask jdee pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
+    (yafolding evil-smartparens evil-snipe evil-org evil-text-object-python evil-replace-with-register evil-search-highlight-persist egg ahungry-theme evil-nerd-commenter evil-space evil-visualstar evil-numbers elfeed wanderlust ## cython-mode evil package-build shut-up epl git commander f s cask jdee pdf-tools eimp virtualenv jedi-core haskell-mode el-get djvu auctex ace-popup-menu ace-flyspell ac-slime ac-math ac-html-csswatcher ac-html ac-cider)))
  '(red "#ffffff")
  '(send-mail-function (quote mailclient-send-it))
  '(tex-view-program-list (quote (("mupdf" ("mupdf f") ""))))
@@ -529,7 +546,8 @@
 		("discogs" . "www.discogs.com")
 		("youtube" .  "www.youtube.com")
 		("amazon" . "www.amazon.com")
-		("lisp documentation" . "http://www.lispworks.com/documentation/HyperSpec/Front/X_Master.htm"))
+		("lisp documentation" . "http://www.lispworks.com/documentation/HyperSpec/Front/X_Master.htm")
+		("leo" . "https://dict.leo.org/englisch-deutsch/"))
 	      webjump-sample-sites))
 
 (set-foreground-color "cyan")
@@ -541,3 +559,5 @@
 (set-foreground-color "cyan")
 (set-cursor-color "cyan")
 (set-background-color "black")
+(add-hook 'evil-mode 'evil-snipe-mode)
+(evil-snipe-mode +1)
