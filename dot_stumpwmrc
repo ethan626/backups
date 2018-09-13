@@ -1,0 +1,253 @@
+;;;;;;;;;;;; .stumprc ;;;;;;;;;;;;;
+;;(defvar quicklisp-path "~/quicklisp"):
+;;(ql:quickload :swank)
+;;(funcall (intern "create-server" :swank) :port 4005)
+
+(defprogram-shortcut conkeror)
+
+(defcommand shell-output (command) ((:shell "/bin/sh -c"))
+	    (message "~a" (run-shell-command command t)))
+
+;;;;; Macros ;;;;;;
+
+(defmacro new-vsplit-command (name commands)
+  `(stumpwm:defcommand ,name () ()
+		       (stumpwm:vsplit)
+		       (stumpwm:move-focus :down)
+		       ,commands))
+
+(defmacro new-hsplit-command (name commands)
+  	  `(stumpwm:defcommand ,name () ()
+		       (stumpwm:hsplit)
+		       (stumpwm:move-focus :down)
+		       ,commands))
+
+(new-hsplit-command launch-xterm-h (stumpwm:run-shell-command "xterm"))
+
+;;;;;; WICD - WIFI ;;;;;
+       
+(setf *wicd-connection-display-status* t)
+(new-vsplit-command wifi-launch (stumpwm:run-shell-command "xterm -e sudo wifi-menu"))
+
+;;;;;;;;;;;;;;;;;; Appearance ;;;;;;;;;;;;;;
+
+(set-bg-color 'cyan)
+(set-fg-color 'black)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Commands ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#|
+"gnew test"
+"gselect 3"
+I"create-music-group"
+"exec xtermp"
+"exec xterm"
+"move-window right"
+If not group - create group and switch
+|#
+(stumpwm:defcommand l8a () ()
+		    (stumpwm:run-shell-command "shutdown now"))
+
+(stumpwm:defcommand launch-xterm () ()
+		    (stumpwm:vsplit)
+		    (stumpwm:move-focus :down)
+		    (stumpwm:run-shell-command "xterm"))
+
+(stumpwm:defcommand launch-clisp() ()
+	(stumpwm:vsplit)
+	(stumpwm:move-focus :down)
+	(stumpwm:run-shell-command "xterm -e clisp"))
+
+(stumpwm:defcommand launch-python () ()
+		    (stumpwm:vsplit)
+		    (stumpwm:move-focus :down)
+		    (stumpwm:run-shell-command "xterm -e ipython"))
+
+(stumpwm:defcommand now-playing() () ; Currently playing track on MOCP
+		    (shell-output "mocp -i"))
+
+(new-vsplit-command emacs-split (emacs))
+(stumpwm:defcommand algebra () ()
+		    (stumpwm:run-shell-command "mupdf ~/school/books/algebra.pdf"))
+
+(stumpwm:defcommand neural () ()
+		    (stumpwm:run-shell-command "mupdf ~/to-read/neural-networks.pdf"))
+
+(stumpwm:defcommand num () ()
+		    (stumpwm:run-shell-command "mupdf ~/school/books/numerical_methods_for_engineers_for_engineers_chapra_canale_6th_edition.pdf"))
+		    
+(stumpwm:defcommand create-music-group () () ;common size for mocp and alsamixer 
+		    (stumpwm:restore-from-file ".stumpwm/music-layout.txt"))
+
+(stumpwm:defcommand create-4-cell-group () () 
+		    (stumpwm:restore-from-file ".stumpwm/stumpwindows4.txt"))
+
+(stumpwm:defcommand create-2-cell-group () () 
+		    (stumpwm:restore-from-file ".stumpwm/stumpwindows2.txt"))
+
+(stumpwm:defcommand create-horizontal-group () () 
+		    (stumpwm:restore-from-file ".stumpwm/horizontal-split.txt"))
+
+
+;; (stumpwm:defcommand move-mouse-up () ()
+;; 		    (stumpwm:ratrelwarp 0 -20))
+;; (stumpwm:defcommand move-mouse-down () ()
+;; 		    (stumpwm:ratrelwarp 0 20))
+;; (stumpwm:defcommand move-mouse-right () ()
+;; 		    (stumpwm:ratrelwarp 20 0))
+;; (stumpwm:defcommand move-mouse-left () ()
+;; 		    (stumpwm:ratrelwarp -20 0))
+
+;;;;;;;;;;;;;;; Keyboard as Mouse ;;;;;;;;;;;;
+
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "Up") "move-mouse-up")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "Down") "move-mouse-down")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "Right") "move-mouse-Right")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "Left") "move-mouse-Left")
+
+;;;;;;;;;; Exec  ;;;;;;;;;;
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-\\") "exec")
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "E") "emacs-split")
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M-w") "wifi-launch")
+
+;;;;;;;;;;; Group Bindings ;;;;;;;;;;
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-#") "create-music-group")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-$") "create-4-cell-group")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-%") "create-horizontal-group")
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-W") "gnew")
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "N") "gnext") 
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "P") "gprev")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-s") "fnext")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-a") "prev")
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-1") "gselect 1")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-2") "gselect 2")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-3") "gselect 3")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-4") "gselect 4")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-5") "gselect 5")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-6") "gselect 6")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-7") "gselect 7")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-8") "gselect 8")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-9") "gselect 9")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-0") "gselect 10")
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-!") "gmove 1")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-@") "gmove 2")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-#") "gmove 3")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-$") "gmove 4")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-%") "gmove 5")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-^") "gmove 6")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-&") "gmove 7")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-*") "gmove 8")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-(") "gmove 9")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-)") "gmove 10")
+
+;;;;;;;;;;;;;; Music and Sound ;;;;;;;;;;;;;
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-'") "exec mocp -G")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86AudioPlay") "exec mocp -G") 
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-]") "exec mocp --next")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86AudioNext") "exec mocp --next")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-[") "exec mocp --previous")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86AudioPrev") "exec mocp --previous")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-=") "exec amixer set Master 5%+")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-XF86AudioRaiseVolume") "exec amixer set Speaker 5%+")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-XF86AudioLowerVolume") "exec amixer set Speaker 5%-")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-XF86AudioLowerVolume") "exec amixer set Speaker 5%-")
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "C-M-XF86AudioRaiseVolume") "exec amixer set Headphone 5%+")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "C-M-XF86AudioLowerVolume") "exec amixer set Headphone 5%-")
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86AudioRaiseVolume") "exec amixer set Master 5%+")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M--") "exec amixer set Master 5%-")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86AudioLowerVolume") "exec amixer set Master 5%-")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86AudioMute") "exec amixer set Master 0")
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-_") "exec amixer set Master 0")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-Right") "exec mocp -k 10")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-Left") "exec mocp -k -10")
+
+;;;;;;;;;;;;;;;; Brightness ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86MonBrightnessUp") "exec xbacklight +10")
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "XF86MonBrightnessDown") "exec xbacklight -10")
+
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "B") "exec xbacklight -set 1")
+;;;;;;;;;;; Window Bindings ;;;;;;;;;;;;;;
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-S") "hsplit")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-A") "vsplit")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-F11") "fnext")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-1") "only")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-2") "fnext")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-3") "fother")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-3") "fother")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-k") "kill")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-w") "delete")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-a") "remove")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-r") "iresize") 
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-Left") "exchange-direction left")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-Right") "exchange-direction right")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-Up") "exchange-direction up")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-Down") "exchange-direction down")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-Left") "move-window left")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-Right") "move-window right")
+;; (stumpwm:define-key stumpwm:*topm-ap* (stumpwm:kbd "M-Up") "move-window up")
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-Down") "move-window down")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-TAB") "fnext")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-p") "pull-hidden-previous")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-o") "pull-hidden-next")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-a") "pull-hidden-previous")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "s-s") "pull-hidden-next")
+
+;;;;;;;;;;;; Launch Programs ;;;;;;;;;;;;;
+
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-q") "exec xterm")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-F2") "conkeror")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-`") "exec conkeror")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-F12") "exec palemoon")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-F3") "emacs")
+
+;; (stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-\"") "now-playing")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-F6") "exec xterm -e alsamixer")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-F4") "exec xterm -e mocp")
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M") "exec xterm -e mocp")
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-F5") "exec xterm -e htop")
+;; (stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M-l") "launch-clisp")
+;; (stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M-p") "launch-python")
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M-m") "exec xterm -e mutt")
+;; (stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M-s") "exec xterm -e stumpish") ;not working(
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M-s") "launch-xterm")
+(stumpwm:define-key stumpwm:*root-map* (stumpwm:kbd "M-S") "launch-xterm-h")
+
+;;;;;;;;;;;;;;;;; MISC ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(stumpwm:define-key stumpwm:*top-map* (stumpwm:kbd "M-g") "ratclick")
+
+;;;;;;;;;;;;;;;;;;;;;; Swank ;;;;;;;;;;;;;;;;;;;;;;;
+
+
+#| (stumpwm:defcommand swank () ()
+  "Turn on the swank server the first time.
+Load a file that re-defines swank and then calls it."
+  ;; Be careful with the quotes!
+  (run-shell-command  "stumpish 'eval (load \/usr/share/common-lisp/source/swank/")
+  (echo-string
+   (current-screen)
+   "Starting swank. M-x slime-connect RET RET, then (in-package stumpwm)."))
+;;
+(define-key *root-map* (kbd "C-s") "swank")
+
+
+;;stumpwm from inside emacs 
+(load "/ethan/.stumpwm/swank-setup.lisp")
+(swank-loader:init)
+(defcommand swank () ()n
+	    (swank:create-server :port 4--5
+				 :style swank:*communication-style*
+				 :dont-close t)
+	    (echo-string (current-screen) "Starting swank. M-x slime-connect RET RET, then (in-package stumpwm)."))
+(swank)		 
+|#
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; end .stumprc ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
