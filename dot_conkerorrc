@@ -1,0 +1,92 @@
+external_content_handlers.set("application/pdf", "mupdf");
+external_content_handlers.set("application/xlsx", "libreoffice");
+external_content_handlers.set("application/docx", "libreoffice");
+define_webjump("wlf","wolframalpha.com");
+define_webjump("d","duckduckgo.com");
+define_webjump("disc","https://www.discogs.com/search/?q=%s&type=all");
+define_webjump("lsp","http://www.lispworks.com/documentation/HyperSpec/Front/X_Master.htm");
+define_webjump("pro","https://protonmail.com");
+define_webjump("cwu","cwu.edu");
+define_webjump("canvas","canvas.cwu.edu");
+define_webjump("eul","www.projecteuler.net");
+define_webjump("crg","www.craigslist.org/");
+define_webjump("aud","audiogon.com");
+define_webjump("amz","amazon.com");
+define_webjump("yt","https://www.youtube.com/results?search_query=%s");
+define_webjump("up","https://www.upwork.com");
+define_webjump("git","https:///www.github.com/search?q=%s");
+define_webjump("le","https://dict.leo.org/englisch-deutsch/%s");
+define_webjump("link","https://linkedin.com");
+define_webjump('mpfs', "https://www.mountainproject.com/forum/103989416/for-sale-for-free-want-to-buy");
+define_webjump('mp', 'https://mountainproject.com');
+define_key(content_buffer_normal_keymap, "N", "find-url-new-buffer");
+
+define_key(content_buffer_normal_keymap, "C-x C-b", "switch-to-buffer");
+define_key(content_buffer_normal_keymap, "w", "switch-to-buffer");
+define_key(content_buffer_normal_keymap, "b", "switch-to-buffer");
+
+define_key(content_buffer_normal_keymap, "Q", "kill-buffer");
+define_key(content_buffer_normal_keymap, "C-x C-k", "kill-buffer");
+
+define_key(content_buffer_normal_keymap, "F", "follow-new-buffer-background");
+define_key(content_buffer_normal_keymap, "C-x n", "follow-new-buffer-background");
+
+define_key(default_base_keymap, "C-[", "minibuffer-abort");
+define_key(content_buffer_normal_keymap, "H", "back");
+define_key(content_buffer_normal_keymap, "L", "forward");
+
+define_key(content_buffer_normal_keymap, "j", "cmd_scrollLineDown");
+define_key(content_buffer_normal_keymap, "k", "cmd_scrollLineUp");
+define_key(content_buffer_normal_keymap, "y", "cmd_scrollLeft");
+define_key(content_buffer_normal_keymap, "p", "cmd_scrollRight");
+
+define_key(content_buffer_normal_keymap, "h", "buffer-previous");
+define_key(content_buffer_normal_keymap, "l", "buffer-next");
+
+define_key(content_buffer_normalkeymap, "/", "cmdsearch");
+
+session_pref("layout.spellcheckDefault", 1);
+
+add_hook("download_finished_hook", function (I) { kill_buffer(I.buffer); });
+require("dom-inspector");
+// set_user_agent(Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit 537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36);
+// set_user_agent("Mozilla/5.0 (X11; Linux x86_64; rv:52.9) Gecko/20100101 Goanna/3.4 Firefox/52.9 Palemoon/27.9.3")
+// user_pref("devtools.debugger.remote-enabled", true);
+
+// var debugging_server_port = debugging_server_port || 6000;
+
+// function start_debugging_server () {
+//     Components.utils.import('resource://gre/modules/devtools/dbg-server.jsm');
+//                 if (!DebuggerServer.initialized) {
+//                     DebuggerServer.init();
+//                     DebuggerServer.addBrowserActors();
+//                     DebuggerServer.allowChromeProcess = true;
+//                 }
+//     if (version_compare(get_mozilla_version(), "37.0") >= 0) {
+//         let listener = DebuggerServer.createListener();
+//         listener.portOrPath = debugging_server_port;
+//         listener.open();
+//     }
+//     else {
+//         DebuggerServer.openListener(debugging_server_port);
+//     }
+// }
+
+// interactive("start-debugging-server",
+//             "Starts the debugging server that you can connect to with Firefox",
+//             start_debugging_server);
+
+
+
+define_variable("firebug_url",
+    "http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js");
+
+function firebug (I) {
+    var doc = I.buffer.document;
+    var script = doc.createElement('script');
+    script.setAttribute('type', 'text/javascript');
+    script.setAttribute('src', firebug_url);
+    script.setAttribute('onload', 'firebug.init();');
+    doc.body.appendChild(script);
+}
+interactive("firebug", "open firebug lite", firebug);
